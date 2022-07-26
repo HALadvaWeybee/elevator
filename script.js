@@ -1,7 +1,7 @@
 "use strict";
 let floors = prompt("how many building floor you want in your building");
-// let numElevators = prompt("Enter the number of Elevators your System has!");
-let numElevators = Math.round(floors / 2);
+let numElevators = prompt("Enter the number of Elevators your System has!");
+// let numElevators = Math.round(floors / 2);
 let maxHeight = Number(floors) * 90;
 let Elevators = [];
 let flag;
@@ -77,29 +77,35 @@ const check = function (i) {
       document.querySelector(`.elevator-${el.id}`).style.border =
         "1px solid red";
       document.querySelector(`.indicator-${el.id}`).innerHTML = `1`;
-      el.floor = 1000000000000;
-    } else {
+      el.floor = 10000000000000;
+      // el.floor = el.floor;
+    } else if(el.checked == false) {
       document.querySelector(`.elevator-${el.id}`).style.border = "none";
-      if (el.floor > Elevators.length) {
-        el.floor = 1;
-      } else {
-        el.floor = el.floor;
-      }
+      console.log("Elevator length", Elevators.length);
+      console.log("Floorrrr", el.floor, i);
+        if (el.floor == 10000000000000) {
+          el.floor = 1;
+        } else {  
+          el.floor = el.floor;
+        }
     }
   }
 };
 
-const close = function (i) {
-  let closeEL = Elevators.map((el) => el.floor).reduce((prev, curr) => {
+const myClose = function (i) {
+  let closeElevator = Elevators.map((el) => el.floor).reduce((prev, curr) => {
     return Math.abs(curr - i) < Math.abs(prev - i) ? curr : prev;
   });
-  let el = Elevators.findIndex((el) => el.floor === closeEL);
-  return el;
+  console.log("closeElevator", closeElevator);
+  let elevator = Elevators.findIndex((el) => el.floor === closeElevator);
+  return elevator;
 };
 
+console.log("Elevator", Elevators);
 const ElevatorMovments = function (close, i) {
   let lift = Elevators[close];
-
+  console.log("close", close);
+  console.log("Iclose", i);
   if (!lift.moving) {
     if (!lift.checked) {
       let animate = null;
@@ -109,7 +115,8 @@ const ElevatorMovments = function (close, i) {
       let tempFloorBtn = positionBtn;
       let tempFloor = lift.floor;
       lift.floor = i;
-      // console.log(lift.floor);
+      console.log("update", Elevators);
+      console.log("lift floor",lift.floor);
       clearInterval(animate);
       animate = setInterval(function () {
         if (positionBtn == distBtn) {
@@ -168,9 +175,10 @@ const ElevatorMovments = function (close, i) {
 };
 
 const btnUp = function (i) {
-  ElevatorMovments(close(i), i);
+  console.log("i", i);
+  ElevatorMovments(myClose(i), i);
 };
 
 const btnDown = function (i) {
-  ElevatorMovments(close(i), i);
+  ElevatorMovments(myClose(i), i);
 };
