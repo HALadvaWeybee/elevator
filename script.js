@@ -1,14 +1,14 @@
 "use strict";
-let floors = prompt("how many building floor you want in your building");
-let numElevators = prompt("Enter the number of Elevators your System has!");
-// let numElevators = Math.round(floors / 2);
-let maxHeight = Number(floors) * 90;
-let Elevators = [];
+let answer = prompt("how many building floor you want in your building");
+let elev = prompt("Enter the number of Elevators your System has!");
+// let elev = Math.round(answer / 2);
+let maxHeight = Number(answer) * 90;
+let allLeeps = [];
 let flag;
 document.querySelector(".container").innerHTML = "";
 
 const showElevators = function () {
-  for (let i = 1; i <= numElevators; i++) {
+  for (let i = 1; i <= elev; i++) {
     let html = `<div class="elevator">
                   <div class="block--${i} blocks" style="height:${maxHeight}px">
                         <div class="elevator-${i} el" >
@@ -16,18 +16,18 @@ const showElevators = function () {
                         </div>
                   </div>
                   <label class="switch">
-                        <input type="checkbox" class=" switchs switch-${i}" onchange="check('${i}')">
+                        <input type="checkbox" class=" switchs switch-${i}" onchange="checkOnOff('${i}')">
                         <span class="slider round"></span>
                   </label>
             </div>`;
-    Elevators.push({ id: i, checked: false, floor: 1, moving: false });
+            allLeeps.push({ id: i, checked: false, floor: 1, moving: false });
     document.querySelector(".container").insertAdjacentHTML("beforeend", html);
   }
   document
     .querySelector(".container")
     .insertAdjacentHTML("beforeend", `<div class="block-buttons"></div>`);
   document.querySelector(`.block-buttons`).style.height = `${maxHeight}px`;
-  for (let i = floors; i >= 1; i--) {
+  for (let i = answer; i >= 1; i--) {
     let html;
     if (i == 1) {
       html = `<div class="floor-${i} floor">
@@ -36,7 +36,7 @@ const showElevators = function () {
                         <div class="upBtn"></div>
                   </button>
             </div>`;
-    } else if (i == floors) {
+    } else if (i == answer) {
       html = `<div class="floor-${i} floor">
                   <div class="floorNo ${i}"><span>${i}</span></div>
                <button class="btns btn-${i}-dwn" onclick="btnDown(${i})">
@@ -67,23 +67,31 @@ const showElevators = function () {
 };
 showElevators();
 
-const check = function (i) {
-  const index = Elevators.findIndex((x) => x.id == i);
-  Elevators[index].checked = !Elevators[index].checked;
+const myClose = function (i) {
+  let closeElevator = allLeeps.map((el) => el.floor).reduce((prev, curr) => {
+    return Math.abs(curr - i) < Math.abs(prev - i) ? curr : prev;
+  });
+  console.log("closeElevator", closeElevator);
+  let elevator = allLeeps.findIndex((el) => el.floor === closeElevator);
+  return elevator;
+};
 
-  for (let el of Elevators) {
+const checkOnOff = function (i) {
+  const index = allLeeps.findIndex((x) => x.id == i);
+  allLeeps[index].checked = !allLeeps[index].checked;
+
+  for (let el of allLeeps) {
     if (el.checked == true) {
       document.querySelector(`.elevator-${el.id}`).style.bottom = "0px";
       document.querySelector(`.elevator-${el.id}`).style.border =
         "1px solid red";
       document.querySelector(`.indicator-${el.id}`).innerHTML = `1`;
-      el.floor = 10000000000000;
-      // el.floor = el.floor;
+      el.floor = 10000;
     } else if(el.checked == false) {
       document.querySelector(`.elevator-${el.id}`).style.border = "none";
-      console.log("Elevator length", Elevators.length);
+      console.log("Elevator length", allLeeps.length);
       console.log("Floorrrr", el.floor, i);
-        if (el.floor == 10000000000000) {
+        if (el.floor == 10000) {
           el.floor = 1;
         } else {  
           el.floor = el.floor;
@@ -92,93 +100,78 @@ const check = function (i) {
   }
 };
 
-const myClose = function (i) {
-  let closeElevator = Elevators.map((el) => el.floor).reduce((prev, curr) => {
-    return Math.abs(curr - i) < Math.abs(prev - i) ? curr : prev;
-  });
-  console.log("closeElevator", closeElevator);
-  let elevator = Elevators.findIndex((el) => el.floor === closeElevator);
-  return elevator;
-};
 
-console.log("Elevator", Elevators);
-const ElevatorMovments = function (close, i) {
-  let lift = Elevators[close];
-  console.log("close", close);
-  console.log("Iclose", i);
-  if (!lift.moving) {
-    if (!lift.checked) {
+const movingLeep = function (data, i) {
+  let leep = allLeeps[data];
+  if (!leep.moving) {
+    if (!leep.checked) {
       let animate = null;
-      // let animateDoors = null;
-      let positionBtn = (lift.floor - 1) * 90;
+      let positionBtn = (leep.floor - 1) * 90;
       let distBtn = 90 * (i - 1);
       let tempFloorBtn = positionBtn;
-      let tempFloor = lift.floor;
-      lift.floor = i;
-      console.log("update", Elevators);
-      console.log("lift floor",lift.floor);
+      let tempFloor = leep.floor;
+      leep.floor = i;
       clearInterval(animate);
       animate = setInterval(function () {
         if (positionBtn == distBtn) {
           if (positionBtn === tempFloorBtn) {
             tempFloorBtn += 90;
-            document.querySelector(`.indicator-${lift.id}`).textContent =
+            document.querySelector(`.indicator-${leep.id}`).textContent =
               tempFloor;
             tempFloor++;
           }
 
-          lift.moving = false;
+          leep.moving = false;
           clearInterval(animate);
         } else {
-          lift.moving = true;
+          leep.moving = true;
           if (positionBtn < distBtn) {
             if (tempFloorBtn === positionBtn) {
               tempFloorBtn += 90;
-              document.querySelector(`.indicator-${lift.id}`).textContent =
+              document.querySelector(`.indicator-${leep.id}`).textContent =
                 tempFloor;
               tempFloor++;
             }
             positionBtn++;
             document.querySelector(
-              `.elevator-${lift.id}`
+              `.elevator-${leep.id}`
             ).style.bottom = `${positionBtn}px`;
           } else {
             if (tempFloorBtn === positionBtn) {
               tempFloorBtn -= 90;
-              document.querySelector(`.indicator-${lift.id}`).textContent =
+              document.querySelector(`.indicator-${leep.id}`).textContent =
                 tempFloor;
               tempFloor--;
             }
             positionBtn--;
             document.querySelector(
-              `.elevator-${lift.id}`
+              `.elevator-${leep.id}`
             ).style.bottom = `${positionBtn}px`;
           }
         }
       }, 5);
     }
   } else {
-    if (flag === true) {
-      if (close === Elevators.length - close) {
+    if (flag == true) {
+      if (data = allLeeps.length - data) {
         flag = false;
       }
-      close = close - 1;
-      ElevatorMovments(close, i);
+      data = data - 1;
+      movingLeep(data, i);
     } else {
-      if (close === Elevators.length - 1) {
+      data = data + 1;
+      if (data == allLeeps.length - 1) {
         flag = true;
       }
-      close = close + 1;
-      ElevatorMovments(close, i);
+      movingLeep(data, i);
     }
   }
 };
 
 const btnUp = function (i) {
-  console.log("i", i);
-  ElevatorMovments(myClose(i), i);
+  movingLeep(myClose(i), i);
 };
 
 const btnDown = function (i) {
-  ElevatorMovments(myClose(i), i);
+  movingLeep(myClose(i), i);
 };
