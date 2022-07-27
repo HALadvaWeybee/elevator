@@ -1,8 +1,6 @@
 "use strict";
-// let answer = prompt("how many building floor you want in your building");
-let answer = 7;
-// let elev = prompt("Enter the number of Elevators your System has!");
-let elev = 3;
+let answer = prompt("how many building floor you want in your building");
+let elev = prompt("Enter the number of Elevators your System has!");
 // let elev = Math.round(answer / 2);
 let maxHeight = Number(answer) * 90;
 let allLeeps = [];
