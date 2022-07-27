@@ -1,6 +1,8 @@
 "use strict";
-let answer = prompt("how many building floor you want in your building");
-let elev = prompt("Enter the number of Elevators your System has!");
+// let answer = prompt("how many building floor you want in your building");
+let answer = 7;
+// let elev = prompt("Enter the number of Elevators your System has!");
+let elev = 3;
 // let elev = Math.round(answer / 2);
 let maxHeight = Number(answer) * 90;
 let allLeeps = [];
@@ -39,7 +41,7 @@ const showElevators = function () {
     } else if (i == answer) {
       html = `<div class="floor-${i} floor">
                   <div class="floorNo ${i}"><span>${i}</span></div>
-               <button class="btns btn-${i}-dwn" onclick="btnDown(${i})">
+               <button class="btns btn-${i}-dwn" onclick="btnUp(${i})">
                   <div class="downBtn"></div>
                </button>
             </div>`;
@@ -49,7 +51,7 @@ const showElevators = function () {
                   <button class="btns btn-${i}-Up" onclick="btnUp(${i})">
                         <div class="upBtn"></div>
                   </button>
-               <button class="btns btn-${i}-dwn" onclick="btnDown(${i})">
+               <button class="btns btn-${i}-dwn" onclick="btnUp(${i})">
                   <div class="downBtn"></div>
                </button>
             </div>`;
@@ -68,17 +70,22 @@ const showElevators = function () {
 showElevators();
 
 const myClose = function (i) {
-  let closeElevator = allLeeps.map((el) => el.floor).reduce((prev, curr) => {
+  // console.log("i",i);
+  
+  let closeElevator = allLeeps.filter(ele => ele.checked == false).map((el) => el.floor).reduce((prev, curr) => {
     return Math.abs(curr - i) < Math.abs(prev - i) ? curr : prev;
   });
-  console.log("closeElevator", closeElevator);
   let elevator = allLeeps.findIndex((el) => el.floor === closeElevator);
   return elevator;
+ 
 };
 
 const checkOnOff = function (i) {
   const index = allLeeps.findIndex((x) => x.id == i);
+  // console.log("index", index, i);
+  // console.log("CheckedLeeps",allLeeps);
   allLeeps[index].checked = !allLeeps[index].checked;
+  
 
   for (let el of allLeeps) {
     if (el.checked == true) {
@@ -89,11 +96,10 @@ const checkOnOff = function (i) {
       el.floor = 10000;
     } else if(el.checked == false) {
       document.querySelector(`.elevator-${el.id}`).style.border = "none";
-      console.log("Elevator length", allLeeps.length);
-      console.log("Floorrrr", el.floor, i);
         if (el.floor == 10000) {
           el.floor = 1;
-        } else {  
+        }
+        else {  
           el.floor = el.floor;
         }
     }
@@ -103,24 +109,26 @@ const checkOnOff = function (i) {
 
 const movingLeep = function (data, i) {
   let leep = allLeeps[data];
+  
   if (!leep.moving) {
+    // console.log("leep", leep);
+    // console.log("allLeeps123",allLeeps);
     if (!leep.checked) {
       let animate = null;
       let positionBtn = (leep.floor - 1) * 90;
       let distBtn = 90 * (i - 1);
       let tempFloorBtn = positionBtn;
       let tempFloor = leep.floor;
+      
       leep.floor = i;
       clearInterval(animate);
       animate = setInterval(function () {
         if (positionBtn == distBtn) {
           if (positionBtn === tempFloorBtn) {
             tempFloorBtn += 90;
-            document.querySelector(`.indicator-${leep.id}`).textContent =
-              tempFloor;
+            document.querySelector(`.indicator-${leep.id}`).textContent = tempFloor;
             tempFloor++;
           }
-
           leep.moving = false;
           clearInterval(animate);
         } else {
@@ -128,25 +136,19 @@ const movingLeep = function (data, i) {
           if (positionBtn < distBtn) {
             if (tempFloorBtn === positionBtn) {
               tempFloorBtn += 90;
-              document.querySelector(`.indicator-${leep.id}`).textContent =
-                tempFloor;
+              document.querySelector(`.indicator-${leep.id}`).textContent =tempFloor;
               tempFloor++;
             }
             positionBtn++;
-            document.querySelector(
-              `.elevator-${leep.id}`
-            ).style.bottom = `${positionBtn}px`;
+            document.querySelector(`.elevator-${leep.id}`).style.bottom = `${positionBtn}px`;
           } else {
             if (tempFloorBtn === positionBtn) {
               tempFloorBtn -= 90;
-              document.querySelector(`.indicator-${leep.id}`).textContent =
-                tempFloor;
+              document.querySelector(`.indicator-${leep.id}`).textContent =tempFloor;
               tempFloor--;
             }
             positionBtn--;
-            document.querySelector(
-              `.elevator-${leep.id}`
-            ).style.bottom = `${positionBtn}px`;
+            document.querySelector(`.elevator-${leep.id}`).style.bottom = `${positionBtn}px`;
           }
         }
       }, 5);
@@ -172,6 +174,6 @@ const btnUp = function (i) {
   movingLeep(myClose(i), i);
 };
 
-const btnDown = function (i) {
-  movingLeep(myClose(i), i);
-};
+// const btnDown = function (i) {
+//   movingLeep(myClose(i), i);
+// };
